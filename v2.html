@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Árvore de Decisão - Captação de Recursos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 50px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .node {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 35px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            text-align: center;
+            min-width: 280px;
+            max-width: 450px;
+        }
+
+        .node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+        }
+
+        .node.start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 1.3em;
+            font-weight: 600;
+            padding: 30px 45px;
+        }
+
+        .node.question {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            font-weight: 600;
+            border: 3px solid #ff1744;
+        }
+
+        .node.option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #2c3e50;
+        }
+
+        .node.option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .node.solution {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border: 2px solid #4dd0e1;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .node.active {
+            border: 3px solid #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+        }
+
+        .level {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .connector {
+            width: 2px;
+            height: 30px;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+            margin: 0 auto;
+        }
+
+        .branch-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .icon {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .node-title {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .node-description {
+            font-size: 0.9em;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .node {
+                min-width: 240px;
+                padding: 20px 25px;
+            }
+
+            .level {
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Árvore de Decisão para Captação de Recursos</h1>
+        
+        <div class="tree">
+            <!-- Nível 0: Start -->
+            <div class="node start" onclick="expandTree('level1')">
+                <div class="icon">⚡</div>
+                <div class="node-title">TED VIGENTE COM ÓRGÃO FEDERAL?</div>
+                <div class="badge">Clique para começar</div>
+            </div>
+
+            <div class="connector hidden" id="conn1"></div>
+
+            <!-- Nível 1: Primeira bifurcação -->
+            <div class="level hidden" id="level1">
+                <div class="branch-container">
+                    <div class="node option" onclick="showRoute('routeA')">
+                        <div class="icon">✅</div>
+                        <div class="node-title">SIM</div>
+                        <div class="node-description">Instituição possui TED vigente</div>
+                    </div>
+                </div>
+
+                <div class="branch-container">
+                    <div class="node option" onclick="showRoute('routeB')">
+                        <div class="icon">❌</div>
+                        <div class="node-title">NÃO</div>
+                        <div class="node-description">Sem TED vigente</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="connector hidden" id="conn2"></div>
+
+            <!-- Rota A: Com TED -->
+            <div class="hidden" id="routeA">
+                <div class="node question">
+                    <div class="icon">🔍</div>
+                    <div class="node-title">O TED ATUAL COMPORTA O PROJETO?</div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solA1')">
+                            <div class="icon">✅</div>
+                            <div class="node-title">SIM</div>
+                            <div class="node-description">TED comporta o projeto</div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node option" onclick="showQuestion('questionA2')">
+                            <div class="icon">❌</div>
+                            <div class="node-title">NÃO</div>
+                            <div class="node-description">TED não comporta</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Solução A1 -->
+            <div class="hidden" id="solA1">
+                <div class="connector"></div>
+                <div class="node solution">
+                    <div class="icon">🎉</div>
+                    <div class="node-title">ROTA A1: Execução Direta no TED</div>
+                    <div class="node-description">
+                        ✓ Tramitação muito mais rápida<br>
+                        ✓ Estrutura administrativa já estabelecida<br>
+                        ✓ Dispensa de licitação em muitos casos<br>
+                        ✓ Conta bancária específica já aberta
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questão A2 -->
+            <div class="hidden" id="questionA2">
+                <div class="connector"></div>
+                <div class="node question">
+                    <div class="icon">📝</div>
+                    <div class="node-title">ADITIVO AO TED É VIÁVEL?</div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solA21')">
+                            <div class="icon">✅</div>
+                            <div class="node-title">SIM</div>
+                            <div class="node-description">Aditivo viável</div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solA22')">
+                            <div class="icon">❌</div>
+                            <div class="node-title">NÃO</div>
+                            <div class="node-description">Aditivo inviável</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Solução A2.1 -->
+            <div class="hidden" id="solA21">
+                <div class="connector"></div>
+                <div class="node solution">
+                    <div class="icon">📋</div>
+                    <div class="node-title">ROTA A2.1: Termo Aditivo</div>
+                    <div class="node-description">
+                        Elaborar proposta de aditivo com justificativa técnica, novo plano de trabalho e negociação com concedente
+                    </div>
+                </div>
+            </div>
+
+            <!-- Solução A2.2 -->
+            <div class="hidden" id="solA22">
+                <div class="connector"></div>
+                <div class="node solution">
+                    <div class="icon">🔄</div>
+                    <div class="node-title">ROTA A2.2: Novo Instrumento</div>
+                    <div class="node-description">
+                        Buscar novo instrumento - Seguir para Rota B
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rota B: Sem TED -->
+            <div class="hidden" id="routeB">
+                <div class="node question">
+                    <div class="icon">💰</div>
+                    <div class="node-title">A FONTE É EMPRESA PRIVADA?</div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node option" onclick="showRoute('routeC')">
+                            <div class="icon">🏢</div>
+                            <div class="node-title">SIM</div>
+                            <div class="node-description">Empresa privada</div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node option" onclick="showRoute('routeD')">
+                            <div class="icon">🏛️</div>
+                            <div class="node-title">NÃO</div>
+                            <div class="node-description">Outro tipo de fonte</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rota C: Empresa Privada -->
+            <div class="hidden" id="routeC">
+                <div class="connector"></div>
+                <div class="node question">
+                    <div class="icon">📊</div>
+                    <div class="node-title">EMPRESA TEM PROGRAMA ESTRUTURADO?</div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node solution">
+                            <div class="icon">🎯</div>
+                            <div class="node-title">ROTA C1: Programa Estruturado</div>
+                            <div class="node-description">
+                                Lei de Incentivo, Edital Próprio, Doação Direta ou Patrocínio
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node solution">
+                            <div class="icon">🤝</div>
+                            <div class="node-title">ROTA C2: Sem Programa</div>
+                            <div class="node-description">
+                                Abordagem personalizada, proposta sob medida, relacionamento próximo
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rota D: Outra Fonte -->
+            <div class="hidden" id="routeD">
+                <div class="connector"></div>
+                <div class="node question">
+                    <div class="icon">🌍</div>
+                    <div class="node-title">QUAL O TIPO DE FONTE?</div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node solution">
+                            <div class="icon">🌐</div>
+                            <div class="node-title">Organismo Internacional</div>
+                            <div class="node-description">ONU, Banco Mundial, BID, etc.</div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node solution">
+                            <div class="icon">🏛️</div>
+                            <div class="node-title">Órgão Público</div>
+                            <div class="node-description">Emenda parlamentar ou convênio</div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node solution">
+                            <div class="icon">🎁</div>
+                            <div class="node-title">Fundação Privada</div>
+                            <div class="node-description">Fundações e institutos</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function expandTree(levelId) {
+            document.getElementById('conn1').classList.remove('hidden');
+            document.getElementById(levelId).classList.remove('hidden');
+        }
+
+        function showRoute(routeId) {
+            // Oculta todas as rotas
+            const routes = ['routeA', 'routeB', 'routeC', 'routeD'];
+            routes.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.classList.add('hidden');
+            });
+
+            // Oculta todas as soluções
+            const solutions = ['solA1', 'solA21', 'solA22'];
+            solutions.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.classList.add('hidden');
+            });
+
+            // Oculta questões
+            const questions = ['questionA2'];
+            questions.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.classList.add('hidden');
+            });
+
+            // Mostra a rota selecionada
+            document.getElementById('conn2').classList.remove('hidden');
+            document.getElementById(routeId).classList.remove('hidden');
+
+            // Scroll suave para a rota
+            document.getElementById(routeId).scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+        }
+
+        function showQuestion(questionId) {
+            const questions = ['questionA2'];
+            questions.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.classList.add('hidden');
+            });
+
+            document.getElementById(questionId).classList.remove('hidden');
+            document.getElementById(questionId).scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+        }
+
+        function showSolution(solutionId) {
+            const solutions = ['solA1', 'solA21', 'solA22'];
+            solutions.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.classList.add('hidden');
+            });
+
+            document.getElementById(solutionId).classList.remove('hidden');
+            document.getElementById(solutionId).scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+        }
+
+        // Adiciona efeito de highlight ao clicar
+        document.querySelectorAll('.node').forEach(node => {
+            node.addEventListener('click', function() {
+                document.querySelectorAll('.node').forEach(n => n.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

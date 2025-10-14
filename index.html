@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Árvore de Decisão - Captação de Recursos</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
+
+:root {
+--primary: #4361ee;
+--primary-light: #4895ef;
+--secondary: #f72585;
+--light: #f8f9fa;
+--dark: #212529;
+--success: #06d6a0;
+--warning: #ffd166;
+--danger: #ef476f;
+--gradient-1: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+--gradient-2: linear-gradient(135deg, #f72585 0%, #b5179e 100%);
+--gradient-3: linear-gradient(135deg, #3a0ca3 0%, #4895ef 100%);
+--gradient-4: linear-gradient(135deg, #06d6a0 0%, #4cc9f0 100%);
+--gradient-5: linear-gradient(135deg, #f72585 0%, #ff9e00 100%);
+--shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+--shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.25);
+--radius: 16px;
+}
+
+body {
+background: #f5f7fa;
+min-height: 100vh;
+padding: 40px 20px;
+color: var(--dark);
+background-image: radial-gradient(#e0e7ff 1.5px, transparent 1.5px);
+background-size: 30px 30px;
+}
+
+.container {
+max-width: 1500px;
+margin: 0 auto;
+}
+
+header {
+text-align: center;
+margin-bottom: 50px;
+position: relative;
+}
+
+.header-content {
+background-color: white;
+padding: 30px;
+border-radius: var(--radius);
+box-shadow: var(--shadow);
+margin-bottom: 30px;
+background-image: 
+    linear-gradient(135deg, rgba(67, 97, 238, 0.15), rgba(58, 12, 163, 0.1)),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23dfe3fa' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+h1 {
+color: var(--primary);
+margin-bottom: 20px;
+font-size: 3em;
+font-weight: 700;
+position: relative;
+display: inline-block;
+}
+
+h1:after {
+content: '';
+position: absolute;
+bottom: -10px;
+left: 50%;
+transform: translateX(-50%);
+width: 80px;
+height: 4px;
+background: var(--gradient-1);
+border-radius: 2px;
+}
+
+.subtitle {
+font-size: 1.2em;
+color: #6c757d;
+max-width: 800px;
+margin: 0 auto;
+line-height: 1.6;
+}
+
+.decision-tree {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 30px;
+position: relative;
+z-index: 1;
+}
+
+.node {
+background: white;
+border-radius: var(--radius);
+padding: 25px 35px;
+box-shadow: var(--shadow);
+cursor: pointer;
+transition: all 0.3s ease;
+position: relative;
+text-align: center;
+min-width: 320px;
+max-width: 500px;
+transform-origin: center;
+}
+
+.node:hover {
+transform: translateY(-5px) scale(1.02);
+box-shadow: var(--shadow-hover);
+}
+
+.node.start {
+background: var(--gradient-3);
+color: white;
+font-size: 1.3em;
+font-weight: 600;
+padding: 35px 45px;
+}
+
+.node.question {
+background: var(--gradient-2);
+color: white;
+font-weight: 600;
+}
+
+.node.option {
+background: white;
+border: 2px solid #e0e0e0;
+color: var(--dark);
+overflow: hidden;
+}
+
+.node.option:before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 5px;
+background: var(--gradient-1);
+transform: scaleX(0);
+transform-origin: left;
+transition: transform 0.3s ease;
+}
+
+.node.option:hover:before {
+transform: scaleX(1);
+}
+
+.node.solution {
+background: white;
+border: none;
+color: var(--dark);
+border-radius: var(--radius);
+position: relative;
+overflow: hidden;
+}
+
+.node.solution:before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: var(--gradient-4);
+opacity: 0.15;
+z-index: -1;
+}
+
+.node.active {
+animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.5); }
+70% { box-shadow: 0 0 0 10px rgba(67, 97, 238, 0); }
+100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
+}
+
+.level {
+display: flex;
+justify-content: center;
+gap: 40px;
+flex-wrap: wrap;
+width: 100%;
+max-width: 1400px;
+}
+
+.connector {
+position: relative;
+width: 3px;
+height: 40px;
+background: var(--primary-light);
+margin: 0 auto;
+z-index: -1;
+}
+
+.connector:before, .connector:after {
+content: '';
+position: absolute;
+background: var(--primary-light);
+border-radius: 50%;
+}
+
+.connector:before {
+width: 9px;
+height: 9px;
+top: -5px;
+left: -3px;
+}
+
+.connector:after {
+width: 9px;
+height: 9px;
+bottom: -5px;
+left: -3px;
+}
+
+.branch-container {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 30px;
+position: relative;
+}
+
+.branch-container:not(:last-child):after {
+content: '';
+position: absolute;
+top: 110px;
+right: -20px;
+width: 40px;
+height: 3px;
+background: var(--primary-light);
+display: none;
+}
+
+.icon {
+font-size: 1.8em;
+margin-bottom: 15px;
+background: rgba(255, 255, 255, 0.15);
+width: 55px;
+height: 55px;
+line-height: 55px;
+border-radius: 50%;
+margin: 0 auto 15px;
+}
+
+.node-title {
+font-size: 1.1em;
+margin-bottom: 10px;
+font-weight: 700;
+letter-spacing: 0.5px;
+}
+
+.node-description {
+font-size: 0.95em;
+opacity: 0.9;
+line-height: 1.5;
+}
+
+.hidden {
+display: none;
+}
+
+.badge {
+display: inline-block;
+background: rgba(255, 255, 255, 0.3);
+padding: 5px 15px;
+border-radius: 30px;
+font-size: 0.85em;
+margin-top: 15px;
+backdrop-filter: blur(5px);
+}
+
+.solution-features {
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+gap: 10px;
+margin-top: 15px;
+}
+
+.feature {
+background: rgba(6, 214, 160, 0.1);
+border-radius: 30px;
+padding: 5px 15px;
+font-size: 0.85em;
+color: #0a9396;
+display: flex;
+align-items: center;
+gap: 5px;
+}
+
+.feature i {
+color: var(--success);
+}
+
+.restart-btn {
+position: fixed;
+bottom: 40px;
+right: 40px;
+width: 60px;
+height: 60px;
+border-radius: 50%;
+background: var(--primary);
+color: white;
+display: flex;
+justify-content: center;
+align-items: center;
+cursor: pointer;
+font-size: 1.5em;
+box-shadow: var(--shadow);
+z-index: 10;
+transition: all 0.3s ease;
+}
+
+.restart-btn:hover {
+transform: rotate(180deg);
+background: var(--secondary);
+}
+
+.progress-container {
+position: fixed;
+top: 30px;
+left: 30px;
+z-index: 100;
+display: flex;
+flex-direction: column;
+gap: 10px;
+background: white;
+padding: 15px;
+border-radius: 10px;
+box-shadow: var(--shadow);
+max-width: 250px;
+}
+
+.progress-title {
+font-weight: 700;
+color: var(--primary);
+margin-bottom: 5px;
+}
+
+.progress-bar {
+height: 8px;
+width: 100%;
+background: #e0e0e0;
+border-radius: 4px;
+overflow: hidden;
+}
+
+.progress-fill {
+height: 100%;
+background: var(--gradient-1);
+width: 0%;
+transition: width 0.5s ease;
+}
+
+.progress-step {
+font-size: 0.85em;
+color: #6c757d;
+}
+
+.solution-card {
+border-radius: var(--radius);
+padding: 30px;
+background: white;
+box-shadow: var(--shadow);
+max-width: 800px;
+margin: 30px auto;
+position: relative;
+}
+
+.solution-card:before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 8px;
+background: var(--gradient-4);
+}
+
+.solution-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 20px;
+}
+
+.solution-title {
+font-size: 1.4em;
+font-weight: 700;
+color: var(--dark);
+}
+
+.solution-icon {
+width: 60px;
+height: 60px;
+background: var(--light);
+border-radius: 50%;
+display: flex;
+justify-content: center;
+align-items: center;
+font-size: 1.8em;
+color: var(--primary);
+}
+
+.solution-content {
+line-height: 1.6;
+}
+
+.solution-footer {
+margin-top: 20px;
+display: flex;
+justify-content: flex-end;
+}
+
+.tooltip {
+position: absolute;
+top: 0;
+right: 0;
+background: var(--light);
+padding: 10px;
+border-radius: 50%;
+width: 40px;
+height: 40px;
+display: flex;
+justify-content: center;
+align-items: center;
+cursor: pointer;
+transition: all 0.3s ease;
+}
+
+.tooltip:hover {
+background: var(--primary);
+color: white;
+}
+
+@media (max-width: 768px) {
+h1 {
+    font-size: 2em;
+}
+
+.node {
+    min-width: 280px;
+    max-width: 340px;
+    padding: 20px 25px;
+}
+
+.level {
+    gap: 25px;
+}
+
+.progress-container {
+    top: auto;
+    bottom: 30px;
+    left: 30px;
+    max-width: calc(100% - 60px);
+}
+
+.restart-btn {
+    bottom: 110px;
+    right: 20px;
+}
+}
+
+.toast {
+position: fixed;
+bottom: 30px;
+left: 50%;
+transform: translateX(-50%) translateY(100px);
+background: white;
+padding: 15px 25px;
+border-radius: 8px;
+box-shadow: 0 5px 30px rgba(0, 0, 0, 0.15);
+z-index: 1000;
+opacity: 0;
+transition: all 0.5s ease;
+max-width: 80%;
+text-align: center;
+}
+
+.toast.active {
+transform: translateX(-50%) translateY(0);
+opacity: 1;
+}
+
+.node-card {
+display: flex;
+flex-direction: column;
+height: 100%;
+}
+
+.node-card-header {
+margin-bottom: 15px;
+}
+
+.node-card-body {
+flex: 1;
+}
+
+.node-card-footer {
+margin-top: 15px;
+}
+
+.node.option.active {
+border-color: var(--primary);
+background: #f8f9ff;
+}
+
+.node.solution .steps {
+text-align: left;
+margin-top: 15px;
+}
+
+.node.solution .step {
+margin-bottom: 8px;
+padding-left: 25px;
+position: relative;
+}
+
+.node.solution .step:before {
+content: "→";
+position: absolute;
+left: 0;
+color: var(--primary);
+}
+
+/* Dark Mode Toggle */
+.dark-mode-toggle {
+position: fixed;
+top: 30px;
+right: 30px;
+z-index: 100;
+width: 50px;
+height: 50px;
+background: white;
+border-radius: 50%;
+display: flex;
+justify-content: center;
+align-items: center;
+cursor: pointer;
+font-size: 1.4em;
+box-shadow: var(--shadow);
+transition: all 0.3s ease;
+}
+
+.dark-mode-toggle:hover {
+transform: rotate(45deg);
+}
+
+.dark-mode {
+background: #121212;
+color: white;
+background-image: radial-gradient(#2a2a2a 1.5px, transparent 1.5px);
+}
+
+.dark-mode .node:not(.start):not(.question) {
+background: #1e1e1e;
+border-color: #333;
+color: white;
+}
+
+.dark-mode .header-content {
+background-color: #1e1e1e;
+color: white;
+background-image: 
+    linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(58, 12, 163, 0.05)),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23333' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.dark-mode .subtitle {
+color: #adb5bd;
+}
+
+.dark-mode .dark-mode-toggle {
+background: #333;
+color: white;
+}
+
+.dark-mode .progress-container,
+.dark-mode .toast,
+.dark-mode .solution-card {
+background: #1e1e1e;
+color: white;
+}
+
+.dark-mode .solution-icon {
+background: #333;
+}
+
+.dark-mode .feature {
+background: rgba(6, 214, 160, 0.05);
+}
+
+.dark-mode .progress-bar {
+background: #333;
+}
+
+.dark-mode .progress-step {
+color: #adb5bd;
+}
+
+/* Efeitos de transição */
+.fade-in {
+animation: fadeIn 0.5s forwards;
+}
+
+.slide-in-right {
+animation: slideInRight 0.5s forwards;
+}
+
+.slide-in-left {
+animation: slideInLeft 0.5s forwards;
+}
+
+.zoom-in {
+animation: zoomIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+from { opacity: 0; }
+to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+from { transform: translateX(50px); opacity: 0; }
+to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInLeft {
+from { transform: translateX(-50px); opacity: 0; }
+to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes zoomIn {
+from { transform: scale(0.8); opacity: 0; }
+to { transform: scale(1); opacity: 1; }
+}
+</style>
+</head>
+<body>
+<div class="progress-container hidden" id="progressContainer">
+<div class="progress-title">Sua jornada de captação</div>
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+</div>
+<div class="progress-step" id="progressStep">Passo 0/5</div>
+</div>
+
+<div class="dark-mode-toggle" onclick="toggleDarkMode()">
+<i class="fas fa-moon"></i>
+</div>
+
+<div class="restart-btn hidden" id="restartBtn" onclick="restartTree()">
+<i class="fas fa-redo-alt"></i>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="container">
+<header>
+<div class="header-content">
+    <h1><i class="fas fa-project-diagram"></i> Árvore de Decisão</h1>
+    <p class="subtitle">Sistema inteligente para auxiliar na seleção da melhor estratégia de captação de recursos para seu projeto, considerando fatores como fonte, tipo de instituição, tempo disponível e complexidade.</p>
+</div>
+</header>
+
+<div class="decision-tree">
+<!-- Nível 0: Start -->
+<div class="node start zoom-in" onclick="expandTree('level1')">
+    <div class="node-card">
+        <div class="node-card-header">
+            <div class="icon"><i class="fas fa-search-dollar"></i></div>
+            <div class="node-title">INICIAR DIAGNÓSTICO DE CAPTAÇÃO</div>
+        </div>
+        <div class="node-card-body">
+            <div class="node-description">Este sistema guiará você através das melhores opções de captação de recursos para seu projeto.</div>
+        </div>
+        <div class="node-card-footer">
+            <div class="badge">Clique para iniciar <i class="fas fa-arrow-right"></i></div>
+        </div>
+    </div>
+</div>
+
+<!-- Nível 1: Primeira questão -->
+<div class="connector hidden" id="conn1"></div>
+<div class="node question hidden" id="question1">
+    <div class="node-card">
+        <div class="node-card-header">
+            <div class="icon"><i class="fas fa-file-contract"></i></div>
+            <div class="node-title">SUA INSTITUIÇÃO POSSUI TED VIGENTE?</div>
+        </div>
+        <div class="node-card-body">
+            <div class="node-description">TED (Termo de Execução Descentralizada) é um instrumento de transferência de recursos entre órgãos federais</div>
+        </div>
+    </div>
+</div>
+
+<div class="connector hidden" id="conn2"></div>
+
+<!-- Nível 1: Primeira bifurcação -->
+<div class="level hidden" id="level1">
+    <div class="branch-container">
+        <div class="node option" onclick="showRoute('tedSim')">
+            <div class="node-card">
+                <div class="node-card-header">
+                    <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-check" style="color: #06d6a0;"></i></div>
+                    <div class="node-title">SIM</div>
+                </div>
+                <div class="node-card-body">
+                    <div class="node-description">Nossa instituição possui TED vigente com órgão federal</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="branch-container">
+        <div class="node option" onclick="showRoute('tedNao')">
+            <div class="node-card">
+                <div class="node-card-header">
+                    <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-times" style="color: #ef476f;"></i></div>
+                    <div class="node-title">NÃO</div>
+                </div>
+                <div class="node-card-body">
+                    <div class="node-description">Não possuímos TED vigente no momento</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rota TED SIM -->
+<div class="hidden" id="tedSim">
+    <div class="node question slide-in-right">
+        <div class="node-card">
+            <div class="node-card-header">
+                <div class="icon"><i class="fas fa-tasks"></i></div>
+                <div class="node-title">O TED ATUAL COMPORTA O PROJETO?</div>
+            </div>
+            <div class="node-card-body">
+                <div class="node-description">Verifique se o escopo, orçamento e cronograma do seu projeto se encaixam no TED vigente</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="connector"></div>
+
+    <div class="level">
+        <div class="branch-container">
+            <div class="node option" onclick="showSolution('solTedComporta')">
+                <div class="node-card">
+                    <div class="node-card-header">
+                        <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-check" style="color: #06d6a0;"></i></div>
+                        <div class="node-title">SIM</div>
+                    </div>
+                    <div class="node-card-body">
+                        <div class="node-description">O TED atual tem escopo, prazo e orçamento compatíveis</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="branch-container">
+            <div class="node option" onclick="showQuestion('questionTedAditivo')">
+                <div class="node-card">
+                    <div class="node-card-header">
+                        <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-times" style="color: #ef476f;"></i></div>
+                        <div class="node-title">NÃO</div>
+                    </div>
+                    <div class="node-card-body">
+                        <div class="node-description">O TED atual não comporta o projeto</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Questão TED Aditivo -->
+<div class="hidden" id="questionTedAditivo">
+    <div class="connector"></div>
+    <div class="node question slide-in-right">
+        <div class="node-card">
+            <div class="node-card-header">
+                <div class="icon"><i class="fas fa-file-signature"></i></div>
+                <div class="node-title">É POSSÍVEL FAZER UM ADITIVO AO TED?</div>
+            </div>
+            <div class="node-card-body">
+                <div class="node-description">Verifique se é possível ampliar valor, prazo ou escopo do TED vigente</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="connector"></div>
+
+    <div class="level">
+        <div class="branch-container">
+            <div class="node option" onclick="showSolution('solTedAditivo')">
+                <div class="node-card">
+                    <div class="node-card-header">
+                        <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-check" style="color: #06d6a0;"></i></div>
+                        <div class="node-title">SIM</div>
+                    </div>
+                    <div class="node-card-body">
+                        <div class="node-description">É possível fazer um aditivo ao TED atual</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="branch-container">
+            <div class="node option" onclick="redirectToNoTed()">
+                <div class="node-card">
+                    <div class="node-card-header">
+                        <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-times" style="color: #ef476f;"></i></div>
+                        <div class="node-title">NÃO</div>
+                    </div>
+                    <div class="node-card-body">
+                        <div class="node-description">Não é possível fazer um aditivo ao TED</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Soluções TED -->
+<div class="hidden" id="solTedAditivo">
+    <div class="connector"></div>
+    <div class="node solution zoom-in">
+        <div class="node-card">
+            <div class="node-card-header">
+                <div class="icon" style="background: rgba(73, 197, 182, 0.1);"><i class="fas fa-file-contract" style="color: #49c5b6;"></i></div>
+                <div class="node-title">TERMO ADITIVO AO TED</div>
+            </div>
+            <div class="node-card-body">
+                <div class="node-description">
+                    Ampliação do escopo, prazo ou orçamento do TED atual para acomodar o novo projeto.
+                </div>
+                <div class="solution-features">
+                    <div class="feature"><i class="fas fa-calendar-plus"></i> Prazo estendido</div>
+                    <div class="feature"><i class="fas fa-money-bill-wave"></i> Orçamento ampliado</div>
+                    <div class="feature"><i class="fas fa-project-diagram"></i> Novo escopo</div>
+                    <div class="feature"><i class="fas fa-handshake"></i> Relação já estabelecida</div>
+                </div>
+                <div class="steps">
+                    <div class="step">Elabore justificativa técnica para o aditivo</div>
+                    <div class="step">Prepare novo plano de trabalho</div>
+                    <div class="step">Negocie com o concedente</div>
+                    <div class="step">Formalize o termo aditivo ao TED</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Soluções TED -->
+<div class="hidden" id="solTedComporta">
+    <div class="connector"></div>
+    <div class="node solution zoom-in">
+        <div class="node-card">
+            <div class="node-card-header">
+                <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-check-circle" style="color: #06d6a0;"></i></div>
+                <div class="node-title">EXECUÇÃO DIRETA VIA TED VIGENTE</div>
+            </div>
+            <div class="node-card-body">
+                <div class="node-description">
+                    Esta é a rota mais rápida e eficiente para execução do seu projeto.
+                </div>
+                <div class="solution-features">
+                    <div class="feature"><i class="fas fa-bolt"></i> Tramitação rápida</div>
+                    <div class="feature"><i class="fas fa-check"></i> Estrutura existente</div>
+                    <div class="feature"><i class="fas fa-calendar-check"></i> Prazos otimizados</div>
+                    <div class="feature"><i class="fas fa-hand-holding-usd"></i> Fluxo financeiro estabelecido</div>
+                </div>
+                <div class="steps">
+                    <div class="step">Verifique o plano de trabalho do TED atual</div>
+                    <div class="step">Prepare documentação técnica do projeto</div>
+                    <div class="step">Alinhe com o concedente sobre a inclusão</div>
+                    <div class="step">Inicie execução dentro do TED vigente</div>
+                </div>
+<!-- Soluções - Fonte Privada -->
+<div class="hidden" id="solEdital">
+    <div class="connector"></div>
+    <div class="node solution zoom-in">
+        <div class="node-card">
+            <div class="node-card-header">
+                <div class="icon" style="background: rgba(73, 197, 182, 0.1);"><i class="fas fa-clipboard-check" style="color: #49c5b6;"></i></div>
+                <div class="node-title">PARTICIPAÇÃO EM EDITAL CORPORATIVO</div>
+            </div>
+            <div class="node-card-body">
+                <div class="node-description">
+                    Inscrição e participação em processos seletivos de empresas.
+                </div>
+                <div class="solution-features">
+                    <div class="feature"><i class="fas fa-search"></i> Monitoramento de editais</div>
+                    <div class="feature"><i class="fas fa-align-left"></i> Proposta formatada</div>
+                    <div class="feature"><i class="fas fa-tasks"></i> Critérios claros</div>
+                    <div class="feature"><i class="fas fa-award"></i> Processo competitivo</div>
+                </div>
+                <div class="steps">
+                    <div class="step">Acompanhe plataformas e sites de editais corporativos</div>
+                    <div class="step">Analise critérios e adeque seu projeto</div>
+                    <div class="step">Prepare documentação e proposta segundo o edital</div>
+                    <div class="step">Foque nos resultados e alinhamento com valores da empresa</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="hidden" id="solLeiIncentivo">
+    <div class="connector"></div>
+    <div class="node solution zoom-in">
+        <div class="node-card">
+            <div class="node-card-header">
+                <div class="icon" style="background: rgba(58, 12, 163, 0.1);"><i class="fas fa-balance-scale" style="color: #3a0ca3;"></i></div>
+                <div class="node-title">CAPTAÇÃO VIA LEIS DE INCENTIVO</div>
+            </div>
+            <div class="node-card-body">
+                <div class="node-description">
+                    Utilização de incentivos fiscais como Rouanet, Audiovisual, Esporte, FIA, etc.
+                </div>
+                <div class="solution-features">
+                    <div class="feature"><i class="fas fa-gavel"></i> Base legal específica</div>
+                    <div class="feature"><i class="fas fa-percent"></i> Dedução fiscal</div>
+                    <div class="feature"><i class="fas fa-clipboard-list"></i> Aprovação prévia</div>
+                    <div class="feature"><i class="fas fa-file-invoice"></i> Prestação de contas</div>
+                </div>
+                <div class="steps">
+                    <div class="step">Verifique a adequação do projeto à lei específica</div>
+                    <div class="step">Inscreva o projeto na plataforma da lei correspondente</div>
+                    <div class="step">Após aprovação, elabore proposta para empresas</div>
+                    <div class="step">Foque nos benefícios fiscais e de imagem para o patrocinador</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="hidden" id="solPatrocinio">
+    <div class="connector"></div>
+    <div class="node solution zoom-in">
+        <div class="node-card">
+            <div class="node-card-header">
+                <div class="icon" style="background: rgba(247, 37, 133, 0.1);"><i class="fas fa-bullhorn" style="color: #f72585;"></i></div>
+                <div class="node-title">CAPTAÇÃO VIA PATROCÍNIO DIRETO</div>
+            </div>
+            <div class="node-card-body">
+                <div class="node-description">
+                    Apoio direto da empresa com contrapartidas de visibilidade e marketing.
+                </div>
+                <div class="solution-features">
+                    <div class="feature"><i class="fas fa-eye"></i> Visibilidade da marca</div>
+                    <div class="feature"><i class="fas fa-handshake"></i> Contrapartidas claras</div>
+                    <div class="feature"><i class="fas fa-bullseye"></i> Alinhamento estratégico</div>
+                    <div class="feature"><i class="fas fa-chart-pie"></i> Métricas de retorno</div>
+                </div>
+                <div class="steps">
+                    <div class="step">Identifique empresas com afinidade temática</div>
+                    <div class="step">Desenvolva proposta com benefícios claros de marketing</div>
+                    <div class="step">Ofereça contrapartidas mensuráveis de exposição</div>
+                    <div class="step">Apresente projeto ao departamento de marketing/comunicação</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="hidden" id="solEmpresaRelacao">
+    <div class="connector"></div>
+    <div class="node solution zoom-in">
+        <div class="node-card">
+            <div class="node-card-header">
+                <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-user-friends" style="color: #06d6a0;"></i></div>
+                <div class="node-title">PROPOSTA SOB MEDIDA</div>
+            </div>
+            <div class="node-card-body">
+                <div class="node-description">
+                    Proposta personalizada aproveitando o relacionamento existente.
+                </div>
+                <div class="solution-features">
+                    <div class="feature"><i class="fas fa-handshake"></i> Confiança estabelecida</div>
+                    <div class="feature"><i class="fas fa-puzzle-piece"></i> Solução customizada</div>
+                    <div class="feature"><i class="fas fa-tachometer-alt"></i> Processo mais rápido</div>
+                    <div class="feature"><i class="fas fa-chart-line"></i> Benefício mútuo</div>
+                </div>
+                <div class="steps">
+                    <div class="step">Agende reunião com o contato da empresa</div>
+                    <div class="step">Apresente proposta alinhada aos interesses corporativos</div>
+                    <div class="step">Destaque benefícios específicos para a empresa</div>
+                    <div class="step">Ofereça flexibilidade na construção da parceria</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="hidden" id="solEmpresaSemRelacao">
+    <div class="connector"></div>
+    <div class="node solution zoom-in">
+        <div class="node-card">
+            <div class="node-card-header">
+                <div class="icon" style="background: rgba(73, 197, 182, 0.1);"><i class="fas fa-door-open" style="color: #49c5b6;"></i></div>
+                <div class="node-title">ESTRATÉGIA DE APROXIMAÇÃO CORPORATIVA</div>
+            </div>
+            <div class="node-card-body">
+                <div class="node-description">
+                    Desenvolvimento gradual de relacionamento com a empresa-alvo.
+                </div>
+                <div class="solution-features">
+                    <div class="feature"><i class="fas fa-search"></i> Pesquisa corporativa</div>
+                    <div class="feature"><i class="fas fa-network-wired"></i> Networking</div>
+                    <div class="feature"><i class="fas fa-lightbulb"></i> Proposta de valor</div>
+                    <div class="feature"><i class="fas fa-hourglass-half"></i> Visão de médio prazo</div>
+                </div>
+                <div class="steps">
+                    <div class="step">Pesquise a fundo os valores e interesses da empresa</div>
+                    <div class="step">Identifique possíveis contatos através da rede profissional</div>
+                    <div class="step">Participe de eventos onde a empresa esteja presente</div>
+                    <div class="step">Inicie com pequenas propostas antes de solicitar grandes apoios</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+<script>
+    // Estado da aplicação
+let currentStep = 0;
+const maxSteps = 5;
+let history = [];
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', function() {
+    updateProgress();
+});
+
+// Função para expandir a árvore
+function expandTree(targetId) {
+    const target = document.getElementById(targetId);
+    const connector1 = document.getElementById('conn1');
+    const question1 = document.getElementById('question1');
+    const connector2 = document.getElementById('conn2');
+    
+    if (target) {
+        connector1.classList.remove('hidden');
+        setTimeout(() => {
+            question1.classList.remove('hidden');
+            question1.classList.add('fade-in');
+        }, 200);
+        setTimeout(() => {
+            connector2.classList.remove('hidden');
+        }, 400);
+        setTimeout(() => {
+            target.classList.remove('hidden');
+            target.classList.add('fade-in');
+        }, 600);
+        
+        document.getElementById('restartBtn').classList.remove('hidden');
+        document.getElementById('progressContainer').classList.remove('hidden');
+        currentStep = 1;
+        updateProgress();
+        
+        showToast('Perfeito! Vamos começar a mapear sua estratégia de captação.');
+    }
+}
+
+// Função para mostrar rota
+function showRoute(routeId) {
+    const route = document.getElementById(routeId);
+    if (route) {
+        history.push(routeId);
+        route.classList.remove('hidden');
+        route.classList.add('slide-in-right');
+        currentStep++;
+        updateProgress();
+        scrollToElement(route);
+    }
+}
+
+// Função para mostrar questão
+function showQuestion(questionId) {
+    const question = document.getElementById(questionId);
+    if (question) {
+        history.push(questionId);
+        question.classList.remove('hidden');
+        question.classList.add('slide-in-right');
+        currentStep++;
+        updateProgress();
+        scrollToElement(question);
+    }
+}
+
+// Função para mostrar solução
+function showSolution(solutionId) {
+    const solution = document.getElementById(solutionId);
+    if (solution) {
+        history.push(solutionId);
+        solution.classList.remove('hidden');
+        solution.classList.add('zoom-in');
+        currentStep++;
+        updateProgress();
+        scrollToElement(solution);
+        showToast('🎉 Solução identificada! Esta é a melhor estratégia para seu caso.');
+    }
+}
+
+// Função para redirecionar para rota "Não TED"
+function redirectToNoTed() {
+    // Esconde a rota TED atual
+    const tedSim = document.getElementById('tedSim');
+    const tedAditivo = document.getElementById('questionTedAditivo');
+    if (tedSim) tedSim.classList.add('hidden');
+    if (tedAditivo) tedAditivo.classList.add('hidden');
+    
+    // Mostra a rota "Não TED"
+    showRoute('tedNao');
+    showToast('Redirecionando para alternativas sem TED...');
+}
+
+// Função de atualização de progresso
+function updateProgress() {
+    const progressFill = document.getElementById('progressFill');
+    const progressStep = document.getElementById('progressStep');
+    
+    if (progressFill && progressStep) {
+        const percentage = (currentStep / maxSteps) * 100;
+        progressFill.style.width = percentage + '%';
+        progressStep.textContent = `Passo ${currentStep}/${maxSteps}`;
+    }
+}
+
+// Função para reiniciar a árvore
+function restartTree() {
+    // Esconde todos os elementos exceto o inicial
+    const hiddenElements = document.querySelectorAll('.hidden, .fade-in, .slide-in-right, .slide-in-left, .zoom-in');
+    hiddenElements.forEach(el => {
+        if (!el.classList.contains('node') || !el.classList.contains('start')) {
+            el.classList.add('hidden');
+            el.classList.remove('fade-in', 'slide-in-right', 'slide-in-left', 'zoom-in');
+        }
+    });
+    
+    // Esconde elementos específicos
+    document.getElementById('conn1').classList.add('hidden');
+    document.getElementById('question1').classList.add('hidden');
+    document.getElementById('conn2').classList.add('hidden');
+    document.getElementById('level1').classList.add('hidden');
+    document.getElementById('restartBtn').classList.add('hidden');
+    document.getElementById('progressContainer').classList.add('hidden');
+    
+    // Esconde todas as rotas e soluções
+    const routes = ['tedSim', 'tedNao', 'questionTedAditivo', 'solTedAditivo', 'solTedComporta',
+                   'questionFontePublica', 'questionEmenda', 'questionEdital', 'solEmenda', 'solEdital',
+                   'questionPrivada', 'questionLeiIncentivo', 'solLeiIncentivo', 'questionPatrocinio',
+                   'solPatrocinio', 'questionEmpresaRelacao', 'solEmpresaRelacao', 'solEmpresaSemRelacao'];
+    
+    routes.forEach(routeId => {
+        const element = document.getElementById(routeId);
+        if (element) {
+            element.classList.add('hidden');
+        }
+    });
+    
+    // Reset do estado
+    currentStep = 0;
+    history = [];
+    updateProgress();
+    
+    // Scroll para o topo
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    showToast('Sistema reiniciado! Pronto para um novo diagnóstico.');
+}
+
+// Função para scroll suave até elemento
+function scrollToElement(element) {
+    setTimeout(() => {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+}
+
+// Função para mostrar toast
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    if (toast) {
+        toast.textContent = message;
+        toast.classList.add('active');
+        
+        setTimeout(() => {
+            toast.classList.remove('active');
+        }, 3000);
+    }
+}
+
+// Função para alternar modo escuro
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const darkModeToggle = document.querySelector('.dark-mode-toggle i');
+    
+    if (document.body.classList.contains('dark-mode')) {
+        darkModeToggle.classList.remove('fa-moon');
+        darkModeToggle.classList.add('fa-sun');
+        showToast('Modo escuro ativado');
+    } else {
+        darkModeToggle.classList.remove('fa-sun');
+        darkModeToggle.classList.add('fa-moon');
+        showToast('Modo claro ativado');
+    }
+}
+</script>
