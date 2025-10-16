@@ -60,19 +60,22 @@
 }
 
 body {
-  background-color: var(--light);
+  background: #f5f7fa;
   min-height: 100vh;
-  padding: 40px 24px;
+  padding: 40px 20px;
   color: var(--dark);
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(2, 66, 72, 0.03) 0%, transparent 20%),
-    radial-gradient(circle at 90% 80%, rgba(173, 103, 252, 0.03) 0%, transparent 20%),
-    radial-gradient(var(--light-100) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 30px 30px;
-  background-attachment: fixed;
+  background-image: radial-gradient(#e0e7ff 1.5px, transparent 1.5px);
+  background-size: 30px 30px;
   overflow-x: hidden;
   transition: var(--transition);
   line-height: 1.5;
+}
+
+.dark-mode {
+  background: #121212;
+  color: white;
+  background-image: radial-gradient(#2a2a2a 1.5px, transparent 1.5px);
+  background-size: 30px 30px;
 }
 
 .container {
