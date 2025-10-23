@@ -1,471 +1,1916 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Árvore de Decisão - Captação de Recursos</title>
+    <title>Árvore de Decisão de Instrumentos Jurídicos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
+:root {
+  /* Cores primárias Enap */
+  --primary: #024248;
+  --primary-light: #007A84;
+  --primary-dark: #002428;
+  
+  /* Roxo inovação */
+  --secondary: #AD67FC;
+  --secondary-light: #BE96FC;
+  --secondary-dark: #8E44E3;
+  
+  /* Tons neutros e de apoio */
+  --light: #F5F8FA;
+  --light-100: #E4EAEE;
+  --dark: #0A2A2D;
+  --dark-800: #16383B;
+  --dark-600: #213F42;
+  
+  /* Cores de status */
+  --success: #00CFD7;
+  --warning: #AD67FC;
+  --danger: #E57373;
+  
+  /* Gradientes modernos */
+  --gradient-main: linear-gradient(135deg, #024248 0%, #007A84 100%);
+  --gradient-accent: linear-gradient(135deg, #9E66E4 0%, #C292FF 100%);
+  --gradient-combo: linear-gradient(135deg, #007A84 0%, #024248 50%, #AD67FC 100%);
+  --gradient-light: linear-gradient(135deg, #E4F6F7 0%, #F2EAFE 100%);
+  --gradient-dark: linear-gradient(135deg, #002428 0%, #18162D 100%);
+  
+  /* Efeitos e dimensões */
+  --shadow-sm: 0 2px 8px rgba(2, 66, 72, 0.08);
+  --shadow: 0 8px 24px rgba(2, 66, 72, 0.12);
+  --shadow-lg: 0 16px 48px rgba(2, 66, 72, 0.18);
+  --shadow-hover: 0 16px 32px rgba(2, 66, 72, 0.25);
+  --radius-sm: 8px;
+  --radius: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+  
+  /* Transições */
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+body {
+  background: #f5f7fa;
+  min-height: 100vh;
+  padding: 40px 20px;
+  color: var(--dark);
+  background-image: radial-gradient(#e0e7ff 1.5px, transparent 1.5px);
+  background-size: 30px 30px;
+  overflow-x: hidden;
+  transition: var(--transition);
+  line-height: 1.5;
+}
 
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 50px;
-            font-size: 2.5em;
-            font-weight: 700;
-        }
+.dark-mode {
+  background: #121212;
+  color: white;
+  background-image: radial-gradient(#2a2a2a 1.5px, transparent 1.5px);
+  background-size: 30px 30px;
+}
 
-        .tree {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px;
-        }
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+}
 
-        .node {
-            background: white;
-            border-radius: 20px;
-            padding: 25px 35px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            text-align: center;
-            min-width: 280px;
-            max-width: 450px;
-        }
+header {
+  text-align: center;
+  margin-bottom: 60px;
+}
 
-        .node:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
-        }
+.header-content {
+  background: white;
+  padding: 40px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  margin-bottom: 30px;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
 
-        .node.start {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-size: 1.3em;
-            font-weight: 600;
-            padding: 30px 45px;
-        }
+.header-content:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--gradient-combo);
+  z-index: 2;
+}
 
-        .node.question {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            font-weight: 600;
-            border: 3px solid #ff1744;
-        }
+.header-content:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23dfe3fa' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.05;
+  z-index: -1;
+}
 
-        .node.option {
-            background: white;
-            border: 2px solid #e0e0e0;
-            color: #2c3e50;
-        }
+h1 {
+  color: var(--primary);
+  margin-bottom: 20px;
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  position: relative;
+  display: inline-block;
+}
 
-        .node.option:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
-        }
+h1:after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: var(--gradient-combo);
+  border-radius: 2px;
+}
 
-        .node.solution {
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-            border: 2px solid #4dd0e1;
-            color: #2c3e50;
-            font-weight: 500;
-        }
+.subtitle {
+  font-size: 1.2rem;
+  color: #5c6b73;
+  max-width: 800px;
+  margin: 24px auto 0;
+  line-height: 1.6;
+  font-weight: 400;
+}
 
-        .node.active {
-            border: 3px solid #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
-        }
+/* Tree structure */
+.decision-tree {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  position: relative;
+  z-index: 1;
+}
 
-        .level {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-            width: 100%;
-        }
+.node {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+  text-align: center;
+  min-width: 320px;
+  max-width: 600px;
+  transform-origin: center;
+  border: 1px solid rgba(0,0,0,0.05);
+  overflow: hidden;
+}
 
-        .connector {
-            width: 2px;
-            height: 30px;
-            background: linear-gradient(to bottom, #667eea, #764ba2);
-            margin: 0 auto;
-        }
+.node-card {
+  padding: 28px 32px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  z-index: 2;
+  position: relative;
+}
 
-        .branch-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px;
-        }
+.node:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-4px);
+}
 
-        .icon {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-        }
+.node.start {
+  background: var(--gradient-main);
+  color: white;
+  font-size: 1.3em;
+  font-weight: 600;
+  border: none;
+}
 
-        .node-title {
-            font-size: 1.1em;
-            margin-bottom: 8px;
-        }
+.node.start::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  z-index: 1;
+}
 
-        .node-description {
-            font-size: 0.9em;
-            opacity: 0.9;
-            line-height: 1.4;
-        }
+.node.question {
+  background: var(--gradient-accent);
+  color: white;
+  font-weight: 600;
+  border: none;
+}
 
-        .hidden {
-            display: none;
-        }
+.node.question::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  z-index: 1;
+}
 
-        .badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.3);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            margin-top: 10px;
-        }
+.node.option {
+  background: white;
+  border: 1px solid rgba(0,0,0,0.08);
+  color: var(--dark);
+  overflow: hidden;
+  position: relative;
+}
 
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8em;
-            }
+.node.option:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--gradient-main);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-fast);
+}
 
-            .node {
-                min-width: 240px;
-                padding: 20px 25px;
-            }
+.node.option:hover:before {
+  transform: scaleX(1);
+}
 
-            .level {
-                gap: 20px;
-            }
-        }
+.node-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.node-title {
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.node.start .node-title,
+.node.question .node-title {
+  color: white;
+}
+
+.node-description {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.node-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.option-button {
+  flex: 1 0 45%;
+  min-width: 150px;
+  background: var(--light);
+  color: var(--primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px 15px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.option-button i {
+  margin-right: 10px;
+}
+
+.option-button:hover {
+  background: var(--light-100);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Level design */
+.level {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.branch-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 320px;
+}
+
+/* Connectors */
+.connector {
+  width: 3px;
+  height: 40px;
+  background: var(--light-100);
+  margin: 5px 0;
+}
+
+/* Animation classes */
+.hidden {
+  display: none !important;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.5s ease forwards;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.5s ease forwards;
+}
+
+.zoom-in {
+  animation: zoomIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { 
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from { 
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes zoomIn {
+  from { 
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  justify-content: center;
+  margin: 40px 0 20px;
+}
+
+.btn {
+  background: white;
+  color: var(--primary);
+  border: 1px solid var(--light-100);
+  border-radius: var(--radius-full);
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn:hover {
+  background: var(--light);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.btn.primary {
+  background: var(--gradient-main);
+  color: white;
+  border: none;
+}
+
+.btn i {
+  font-size: 0.9em;
+}
+
+.dark-mode-toggle {
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  background: white;
+  color: var(--dark);
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  z-index: 100;
+  transition: var(--transition);
+}
+
+.dark-mode-toggle:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+}
+
+.dark-mode .dark-mode-toggle {
+  background: var(--dark-800);
+  color: white;
+}
+
+/* Progress bar */
+.progress-container {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto 40px;
+  background: white;
+  border-radius: var(--radius-full);
+  height: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--gradient-combo);
+  width: 0;
+  transition: width 0.5s ease;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  color: var(--dark-600);
+  font-size: 0.85rem;
+}
+
+.dark-mode .progress-container {
+  background: var(--dark-800);
+}
+
+.dark-mode .progress-info {
+  color: var(--light-100);
+}
+
+/* Solution styling */
+.solution {
+  width: 100%;
+  max-width: 800px;
+}
+
+.solution-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.feature {
+  background: rgba(0, 122, 132, 0.06);
+  padding: 12px 15px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.dark-mode .feature {
+  background: rgba(0, 122, 132, 0.12);
+}
+
+.feature i {
+  margin-right: 10px;
+  color: var(--primary-light);
+}
+
+.node.solution {
+  cursor: default;
+}
+
+.node.solution:hover {
+  transform: translateY(0);
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.step {
+  background: rgba(173, 103, 252, 0.06);
+  padding: 12px 15px;
+  border-radius: var(--radius-sm);
+  position: relative;
+  padding-left: 35px;
+  font-weight: 500;
+  counter-increment: step-counter;
+}
+
+.dark-mode .step {
+  background: rgba(173, 103, 252, 0.12);
+}
+
+.step:before {
+  content: counter(step-counter);
+  position: absolute;
+  left: 10px;
+  top: 12px;
+  width: 20px;
+  height: 20px;
+  background: var(--secondary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Toast notification */
+.toast {
+  position: fixed;
+  bottom: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--dark);
+  color: white;
+  padding: 15px 25px;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  transition: bottom 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.toast.active {
+  bottom: 30px;
+}
+
+.dark-mode .toast {
+  background: var(--light);
+  color: var(--dark);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2.2rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+  
+  .node {
+    min-width: unset;
+    width: 90%;
+  }
+  
+  .node-card {
+    padding: 20px;
+  }
+  
+  .solution-features {
+    grid-template-columns: 1fr;
+  }
+  
+  .branch-container {
+    min-width: unset;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content {
+    padding: 25px 15px;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+  }
+  
+  .option-button {
+    flex: 1 0 100%;
+  }
+  
+  .node-options {
+    flex-direction: column;
+  }
+  
+  .feature {
+    font-size: 0.9rem;
+  }
+  
+  .step {
+    font-size: 0.9rem;
+  }
+}
     </style>
 </head>
 <body>
+    <div class="progress-container hidden" id="progressContainer">
+        <div class="progress-title">Sua jornada de escolha jurídica</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-step" id="progressStep">Passo 0/5</div>
+    </div>
+
+    <div class="dark-mode-toggle" onclick="toggleDarkMode()">
+        <i class="fas fa-moon"></i>
+    </div>
+
+    <div class="restart-btn hidden" id="restartBtn" onclick="restartTree()">
+        <i class="fas fa-redo-alt"></i>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
     <div class="container">
-        <h1>🎯 Árvore de Decisão para Captação de Recursos</h1>
-        
-        <div class="tree">
-            <!-- Nível 0: Start -->
-            <div class="node start" onclick="expandTree('level1')">
-                <div class="icon">⚡</div>
-                <div class="node-title">TED VIGENTE COM ÓRGÃO FEDERAL?</div>
-                <div class="badge">Clique para começar</div>
+        <header>
+            <div class="header-content">
+                <h1><i class="fas fa-project-diagram"></i> Ferramentas de Captação</h1>
+                <p class="subtitle">Sistema inteligente para escolher o instrumento jurídico ideal para sua parceria, considerando fatores como natureza da parceria, tipo de instituição e recursos envolvidos.</p>
             </div>
+        </header>
 
-            <div class="connector hidden" id="conn1"></div>
-
-            <!-- Nível 1: Primeira bifurcação -->
-            <div class="level hidden" id="level1">
-                <div class="branch-container">
-                    <div class="node option" onclick="showRoute('routeA')">
-                        <div class="icon">✅</div>
-                        <div class="node-title">SIM</div>
-                        <div class="node-description">Instituição possui TED vigente</div>
+        <div class="decision-tree">
+            <!-- Nível 0: Start -->
+            <div class="node start zoom-in" onclick="expandTree('level1')">
+                <div class="node-card">
+                    <div class="node-card-header">
+                        <div class="icon"><i class="fas fa-search-dollar"></i></div>
+                        <div class="node-title">INICIAR DIAGNÓSTICO DE INSTRUMENTO JURÍDICO</div>
+                    </div>
+                    <div class="node-card-body">
+                        <div class="node-description">Este sistema guiará você através das melhores opções de instrumento jurídico para sua parceria.</div>
+                    </div>
+                    <div class="node-card-footer">
+                        <div class="badge">Clique para iniciar <i class="fas fa-arrow-right"></i></div>
                     </div>
                 </div>
+            </div>
 
-                <div class="branch-container">
-                    <div class="node option" onclick="showRoute('routeB')">
-                        <div class="icon">❌</div>
-                        <div class="node-title">NÃO</div>
-                        <div class="node-description">Sem TED vigente</div>
+            <!-- Nível 1: Primeira questão -->
+            <div class="connector hidden" id="conn1"></div>
+            <div class="node question hidden" id="question1">
+                <div class="node-card">
+                    <div class="node-card-header">
+                        <div class="icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                        <div class="node-title">A PARCERIA ENVOLVE TRANSFERÊNCIA DE RECURSOS FINANCEIROS?</div>
+                    </div>
+                    <div class="node-card-body">
+                        <div class="node-description">Verifica se a parceria terá repasse de recursos financeiros entre as partes</div>
                     </div>
                 </div>
             </div>
 
             <div class="connector hidden" id="conn2"></div>
 
-            <!-- Rota A: Com TED -->
-            <div class="hidden" id="routeA">
-                <div class="node question">
-                    <div class="icon">🔍</div>
-                    <div class="node-title">O TED ATUAL COMPORTA O PROJETO?</div>
-                </div>
-
-                <div class="connector"></div>
-
-                <div class="level">
-                    <div class="branch-container">
-                        <div class="node option" onclick="showSolution('solA1')">
-                            <div class="icon">✅</div>
-                            <div class="node-title">SIM</div>
-                            <div class="node-description">TED comporta o projeto</div>
-                        </div>
-                    </div>
-
-                    <div class="branch-container">
-                        <div class="node option" onclick="showQuestion('questionA2')">
-                            <div class="icon">❌</div>
-                            <div class="node-title">NÃO</div>
-                            <div class="node-description">TED não comporta</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Solução A1 -->
-            <div class="hidden" id="solA1">
-                <div class="connector"></div>
-                <div class="node solution">
-                    <div class="icon">🎉</div>
-                    <div class="node-title">ROTA A1: Execução Direta no TED</div>
-                    <div class="node-description">
-                        ✓ Tramitação muito mais rápida<br>
-                        ✓ Estrutura administrativa já estabelecida<br>
-                        ✓ Dispensa de licitação em muitos casos<br>
-                        ✓ Conta bancária específica já aberta
-                    </div>
-                </div>
-            </div>
-
-            <!-- Questão A2 -->
-            <div class="hidden" id="questionA2">
-                <div class="connector"></div>
-                <div class="node question">
-                    <div class="icon">📝</div>
-                    <div class="node-title">ADITIVO AO TED É VIÁVEL?</div>
-                </div>
-
-                <div class="connector"></div>
-
-                <div class="level">
-                    <div class="branch-container">
-                        <div class="node option" onclick="showSolution('solA21')">
-                            <div class="icon">✅</div>
-                            <div class="node-title">SIM</div>
-                            <div class="node-description">Aditivo viável</div>
-                        </div>
-                    </div>
-
-                    <div class="branch-container">
-                        <div class="node option" onclick="showSolution('solA22')">
-                            <div class="icon">❌</div>
-                            <div class="node-title">NÃO</div>
-                            <div class="node-description">Aditivo inviável</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Solução A2.1 -->
-            <div class="hidden" id="solA21">
-                <div class="connector"></div>
-                <div class="node solution">
-                    <div class="icon">📋</div>
-                    <div class="node-title">ROTA A2.1: Termo Aditivo</div>
-                    <div class="node-description">
-                        Elaborar proposta de aditivo com justificativa técnica, novo plano de trabalho e negociação com concedente
-                    </div>
-                </div>
-            </div>
-
-            <!-- Solução A2.2 -->
-            <div class="hidden" id="solA22">
-                <div class="connector"></div>
-                <div class="node solution">
-                    <div class="icon">🔄</div>
-                    <div class="node-title">ROTA A2.2: Novo Instrumento</div>
-                    <div class="node-description">
-                        Buscar novo instrumento - Seguir para Rota B
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rota B: Sem TED -->
-            <div class="hidden" id="routeB">
-                <div class="node question">
-                    <div class="icon">💰</div>
-                    <div class="node-title">A FONTE É EMPRESA PRIVADA?</div>
-                </div>
-
-                <div class="connector"></div>
-
-                <div class="level">
-                    <div class="branch-container">
-                        <div class="node option" onclick="showRoute('routeC')">
-                            <div class="icon">🏢</div>
-                            <div class="node-title">SIM</div>
-                            <div class="node-description">Empresa privada</div>
-                        </div>
-                    </div>
-
-                    <div class="branch-container">
-                        <div class="node option" onclick="showRoute('routeD')">
-                            <div class="icon">🏛️</div>
-                            <div class="node-title">NÃO</div>
-                            <div class="node-description">Outro tipo de fonte</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rota C: Empresa Privada -->
-            <div class="hidden" id="routeC">
-                <div class="connector"></div>
-                <div class="node question">
-                    <div class="icon">📊</div>
-                    <div class="node-title">EMPRESA TEM PROGRAMA ESTRUTURADO?</div>
-                </div>
-
-                <div class="connector"></div>
-
-                <div class="level">
-                    <div class="branch-container">
-                        <div class="node solution">
-                            <div class="icon">🎯</div>
-                            <div class="node-title">ROTA C1: Programa Estruturado</div>
-                            <div class="node-description">
-                                Lei de Incentivo, Edital Próprio, Doação Direta ou Patrocínio
+            <!-- Nível 1: Primeira bifurcação -->
+            <div class="level hidden" id="level1">
+                <div class="branch-container">
+                    <div class="node option" onclick="showRoute('transferenciaSim')">
+                        <div class="node-card">
+                            <div class="node-card-header">
+                                <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-check" style="color: #06d6a0;"></i></div>
+                                <div class="node-title">SIM</div>
+                            </div>
+                            <div class="node-card-body">
+                                <div class="node-description">A parceria envolve transferência de recursos financeiros</div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="branch-container">
-                        <div class="node solution">
-                            <div class="icon">🤝</div>
-                            <div class="node-title">ROTA C2: Sem Programa</div>
-                            <div class="node-description">
-                                Abordagem personalizada, proposta sob medida, relacionamento próximo
+                <div class="branch-container">
+                    <div class="node option" onclick="showRoute('transferenciaNao')">
+                        <div class="node-card">
+                            <div class="node-card-header">
+                                <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-times" style="color: #ef476f;"></i></div>
+                                <div class="node-title">NÃO</div>
+                            </div>
+                            <div class="node-card-body">
+                                <div class="node-description">A parceria não envolve transferência de recursos financeiros</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Rota D: Outra Fonte -->
-            <div class="hidden" id="routeD">
-                <div class="connector"></div>
-                <div class="node question">
-                    <div class="icon">🌍</div>
-                    <div class="node-title">QUAL O TIPO DE FONTE?</div>
+            <!-- Rota SIM: Transferência financeira -->
+            <div class="hidden" id="transferenciaSim">
+                <div class="node question slide-in-right">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon"><i class="fas fa-exchange-alt"></i></div>
+                            <div class="node-title">A PARCERIA ENVOLVE RECEBIMENTO OU REPASSE DE RECURSOS PELA INSTITUIÇÃO?</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">Verifica se os recursos serão recebidos ou repassados pela sua instituição</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="connector"></div>
 
                 <div class="level">
                     <div class="branch-container">
-                        <div class="node solution">
-                            <div class="icon">🌐</div>
-                            <div class="node-title">Organismo Internacional</div>
-                            <div class="node-description">ONU, Banco Mundial, BID, etc.</div>
+                        <div class="node option" onclick="showRoute('recebimento')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-download" style="color: #06d6a0;"></i></div>
+                                    <div class="node-title">RECEBIMENTO</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">A instituição receberá os recursos financeiros</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="branch-container">
-                        <div class="node solution">
-                            <div class="icon">🏛️</div>
-                            <div class="node-title">Órgão Público</div>
-                            <div class="node-description">Emenda parlamentar ou convênio</div>
+                        <div class="node option" onclick="showRoute('repasse')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-upload" style="color: #ef476f;"></i></div>
+                                    <div class="node-title">REPASSE</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">A instituição repassará os recursos financeiros</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rota Recebimento -->
+            <div class="hidden" id="recebimento">
+                <div class="node question slide-in-right">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon"><i class="fas fa-lightbulb"></i></div>
+                            <div class="node-title">O RECEBIMENTO SE ENQUADRA NA LEI DE INOVAÇÃO (LEI 10.973/2004)?</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">Verifica se a parceria está relacionada à inovação, pesquisa científica e tecnológica</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solAcordoParceria')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-check" style="color: #06d6a0;"></i></div>
+                                    <div class="node-title">SIM</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">A parceria se enquadra na Lei de Inovação</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="branch-container">
-                        <div class="node solution">
-                            <div class="icon">🎁</div>
-                            <div class="node-title">Fundação Privada</div>
-                            <div class="node-description">Fundações e institutos</div>
+                        <div class="node option" onclick="showRoute('outroRecebimento')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-times" style="color: #ef476f;"></i></div>
+                                    <div class="node-title">NÃO</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">A parceria não se enquadra na Lei de Inovação</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outro tipo de recebimento -->
+            <div class="hidden" id="outroRecebimento">
+                <div class="node question slide-in-right">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon"><i class="fas fa-building"></i></div>
+                            <div class="node-title">QUAL A NATUREZA JURÍDICA DO PARCEIRO?</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">Identifica o tipo de instituição parceira</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solConvenioReceita')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-building" style="color: #06d6a0;"></i></div>
+                                    <div class="node-title">EMPRESAS E ENTIDADES PRIVADAS</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">O parceiro é uma empresa ou entidade privada</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solAcordoInternacional')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-globe" style="color: #ef476f;"></i></div>
+                                    <div class="node-title">ORGANISMO INTERNACIONAL</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">O parceiro é um organismo internacional</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rota Repasse -->
+            <div class="hidden" id="repasse">
+                <div class="node question slide-in-right">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon"><i class="fas fa-building"></i></div>
+                            <div class="node-title">QUAL A NATUREZA JURÍDICA DO PARCEIRO?</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">Identifica o tipo de instituição parceira que receberá os recursos</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solTED')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-university" style="color: #06d6a0;"></i></div>
+                                    <div class="node-title">ÓRGÃO FEDERAL</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">O parceiro é um órgão da administração pública federal</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node option" onclick="showQuestion('outroTipoRepasse')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-landmark" style="color: #ef476f;"></i></div>
+                                    <div class="node-title">OUTROS</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">O parceiro é outro tipo de entidade</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Outros tipos de repasse -->
+            <div class="hidden" id="outroTipoRepasse">
+                <div class="node question slide-in-right">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon"><i class="fas fa-building"></i></div>
+                            <div class="node-title">ESPECIFIQUE O TIPO DE ENTIDADE</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">Identifica o tipo específico de entidade parceira</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solConvenioRepasse')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-city" style="color: #06d6a0;"></i></div>
+                                    <div class="node-title">ESTADO/MUNICÍPIO</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">Entidades públicas estaduais ou municipais</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node option" onclick="showQuestion('questionOsc')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-hands-helping" style="color: #ef476f;"></i></div>
+                                    <div class="node-title">ORGANIZAÇÕES SOCIAIS</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">Organizações da Sociedade Civil (OSCs)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questão OSC -->
+            <div class="hidden" id="questionOsc">
+                <div class="node question slide-in-right">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon"><i class="fas fa-question-circle"></i></div>
+                            <div class="node-title">A PARCERIA SE ENQUADRA NO MROSC (LEI 13.019/2014)?</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">Verifica se a parceria está no âmbito do Marco Regulatório das Organizações da Sociedade Civil</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node option" onclick="showQuestion('questionObjetivoOsc')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-check" style="color: #06d6a0;"></i></div>
+                                    <div class="node-title">SIM</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">A parceria se enquadra no MROSC</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node option" onclick="showQuestion('questionFinanceira')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-times" style="color: #ef476f;"></i></div>
+                                    <div class="node-title">NÃO</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">A parceria não se enquadra no MROSC</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Objetivo OSC -->
+            <div class="hidden" id="questionObjetivoOsc">
+                <div class="node question slide-in-right">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon"><i class="fas fa-bullseye"></i></div>
+                            <div class="node-title">QUAL O OBJETIVO PRINCIPAL EM RELAÇÃO À OSC?</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">Identifica o objetivo principal da parceria com a OSC</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solTermoColaboracao')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-handshake" style="color: #06d6a0;"></i></div>
+                                    <div class="node-title">EXECUÇÃO DE PROJETOS</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">Execução de projetos ou atividades propostas pela Administração Pública</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solTermoFomento')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-lightbulb" style="color: #ef476f;"></i></div>
+                                    <div class="node-title">FOMENTO A PROJETOS</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">Fomento a projetos de iniciativas da própria OSC</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questão Financeira (Agente financeiro) -->
+            <div class="hidden" id="questionFinanceira">
+                <div class="node question slide-in-right">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon"><i class="fas fa-money-bill-wave"></i></div>
+                            <div class="node-title">A TRANSFERÊNCIA SERÁ OPERACIONALIZADA POR INSTITUIÇÃO FINANCEIRA?</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">Verifica se os recursos serão transferidos por meio de uma instituição financeira oficial</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solConvenioRepasse')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-check" style="color: #06d6a0;"></i></div>
+                                    <div class="node-title">NÃO</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">A transferência será direta, sem intermediação financeira</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solContratoRepasse')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-university" style="color: #ef476f;"></i></div>
+                                    <div class="node-title">SIM</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">A transferência será operacionalizada por uma instituição financeira</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rota SEM transferência financeira -->
+            <div class="hidden" id="transferenciaNao">
+                <div class="node question slide-in-right">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon"><i class="fas fa-balance-scale"></i></div>
+                            <div class="node-title">A PARCERIA TEM CONTRAPARTIDA NÃO FINANCEIRA?</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">Verifica se há contrapartidas não financeiras na parceria (serviços, uso de plataforma, cursos, etc.)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node option" onclick="showRoute('contrapartidaSim')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-check" style="color: #06d6a0;"></i></div>
+                                    <div class="node-title">SIM</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">Há contrapartidas não financeiras na parceria</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solConsultaJuridica')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-times" style="color: #ef476f;"></i></div>
+                                    <div class="node-title">NÃO</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">Não há contrapartidas na parceria</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rota Contrapartida SIM -->
+            <div class="hidden" id="contrapartidaSim">
+                <div class="node question slide-in-right">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon"><i class="fas fa-building"></i></div>
+                            <div class="node-title">QUAL A NATUREZA JURÍDICA DO PARCEIRO?</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">Identifica o tipo de instituição parceira</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node option" onclick="showQuestion('questionJuridicaInovacao')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-university" style="color: #06d6a0;"></i></div>
+                                    <div class="node-title">PÚBLICA</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">O parceiro é uma instituição pública</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node option" onclick="showQuestion('questionJuridicaInovacao')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-building" style="color: #ef476f;"></i></div>
+                                    <div class="node-title">PRIVADA</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">O parceiro é uma instituição privada</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questão Lei de Inovação -->
+            <div class="hidden" id="questionJuridicaInovacao">
+                <div class="node question slide-in-right">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon"><i class="fas fa-lightbulb"></i></div>
+                            <div class="node-title">A PARCERIA SE ENQUADRA NA LEI DE INOVAÇÃO (LEI 10.973/2004)?</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">Verifica se a parceria está relacionada à inovação, pesquisa científica e tecnológica</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node option" onclick="showQuestion('questionObjetoInovacao')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-check" style="color: #06d6a0;"></i></div>
+                                    <div class="node-title">SIM</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">A parceria se enquadra na Lei de Inovação</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node option" onclick="showQuestion('questionObjetoGeral')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-times" style="color: #ef476f;"></i></div>
+                                    <div class="node-title">NÃO</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">A parceria não se enquadra na Lei de Inovação</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questão Objeto Inovação -->
+            <div class="hidden" id="questionObjetoInovacao">
+                <div class="node question slide-in-right">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon"><i class="fas fa-project-diagram"></i></div>
+                            <div class="node-title">QUAL O OBJETO PRINCIPAL RELACIONADO À INOVAÇÃO?</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">Identifica o objeto principal da parceria relacionado à inovação ou ICT</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solContratoSTE')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-cogs" style="color: #06d6a0;"></i></div>
+                                    <div class="node-title">SERVIÇOS TÉCNICOS</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">Prestação de Serviços Técnicos Especializados</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solAcordoParcerias')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-hands-helping" style="color: #ef476f;"></i></div>
+                                    <div class="node-title">P&D&I</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">Pesquisa, Desenvolvimento e Inovação em cooperação</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questão Objeto Geral -->
+            <div class="hidden" id="questionObjetoGeral">
+                <div class="node question slide-in-right">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon"><i class="fas fa-project-diagram"></i></div>
+                            <div class="node-title">QUAL O OBJETO PRINCIPAL DA PARCERIA?</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">Identifica o objeto principal da parceria sem transferência de recursos</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connector"></div>
+
+                <div class="level">
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solContratoPrestacaoServico')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(6, 214, 160, 0.1);"><i class="fas fa-cogs" style="color: #06d6a0;"></i></div>
+                                    <div class="node-title">SERVIÇOS</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">Prestação de serviços entre as partes</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="branch-container">
+                        <div class="node option" onclick="showSolution('solAcordoCooperacao')">
+                            <div class="node-card">
+                                <div class="node-card-header">
+                                    <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-handshake" style="color: #ef476f;"></i></div>
+                                    <div class="node-title">COOPERAÇÃO</div>
+                                </div>
+                                <div class="node-card-body">
+                                    <div class="node-description">Cooperação técnica entre as partes</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Soluções -->
+            <div class="hidden" id="solAcordoParceria">
+                <div class="connector"></div>
+                <div class="node solution zoom-in">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon" style="background: rgba(73, 197, 182, 0.1);"><i class="fas fa-handshake" style="color: #49c5b6;"></i></div>
+                            <div class="node-title">ACORDO DE PARCERIA</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">
+                                Instrumento jurídico para formalização de parcerias para pesquisa, desenvolvimento e inovação, conforme Lei 10.973/2004.
+                            </div>
+                            <div class="solution-features">
+                                <div class="feature"><i class="fas fa-lightbulb"></i> Lei de Inovação</div>
+                                <div class="feature"><i class="fas fa-money-bill-wave"></i> Recebimento de recursos</div>
+                                <div class="feature"><i class="fas fa-flask"></i> P&D&I</div>
+                                <div class="feature"><i class="fas fa-university"></i> ICT</div>
+                            </div>
+                            <div class="steps">
+                                <div class="step">Elaborar plano de trabalho detalhado</div>
+                                <div class="step">Definir atividades e resultados esperados</div>
+                                <div class="step">Estabelecer propriedade intelectual</div>
+                                <div class="step">Formalizar acordo jurídico específico</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden" id="solConvenioReceita">
+                <div class="connector"></div>
+                <div class="node solution zoom-in">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon" style="background: rgba(73, 197, 182, 0.1);"><i class="fas fa-file-contract" style="color: #49c5b6;"></i></div>
+                            <div class="node-title">CONVÊNIO DE RECEITA/CONTRATO</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">
+                                Instrumento jurídico para formalização do recebimento de recursos de entidades privadas.
+                            </div>
+                            <div class="solution-features">
+                                <div class="feature"><i class="fas fa-money-bill-wave"></i> Recebimento de recursos</div>
+                                <div class="feature"><i class="fas fa-building"></i> Entidade privada</div>
+                                <div class="feature"><i class="fas fa-clipboard-list"></i> Plano de trabalho</div>
+                                <div class="feature"><i class="fas fa-file-invoice"></i> Prestação de contas</div>
+                            </div>
+                            <div class="steps">
+                                <div class="step">Elaborar plano de trabalho e cronograma</div>
+                                <div class="step">Definir obrigações das partes</div>
+                                <div class="step">Estabelecer mecanismos de controle</div>
+                                <div class="step">Formalizar convênio ou contrato específico</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden" id="solAcordoInternacional">
+                <div class="connector"></div>
+                <div class="node solution zoom-in">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon" style="background: rgba(73, 197, 182, 0.1);"><i class="fas fa-globe" style="color: #49c5b6;"></i></div>
+                            <div class="node-title">ACORDO/CONVÊNIO INTERNACIONAL/PRODOC</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">
+                                Instrumento específico para parcerias com organismos internacionais.
+                            </div>
+                            <div class="solution-features">
+                                <div class="feature"><i class="fas fa-globe"></i> Parceria internacional</div>
+                                <div class="feature"><i class="fas fa-money-bill-wave"></i> Recebimento de recursos</div>
+                                <div class="feature"><i class="fas fa-balance-scale"></i> Tratamento específico</div>
+                                <div class="feature"><i class="fas fa-gavel"></i> Análise jurídica específica</div>
+                            </div>
+                            <div class="steps">
+                                <div class="step">Realizar análise específica da parceria</div>
+                                <div class="step">Consultar área internacional da instituição</div>
+                                <div class="step">Verificar normativas específicas</div>
+                                <div class="step">Elaborar documento conforme padrões do organismo</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden" id="solTED">
+                <div class="connector"></div>
+                <div class="node solution zoom-in">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon" style="background: rgba(73, 197, 182, 0.1);"><i class="fas fa-university" style="color: #49c5b6;"></i></div>
+                            <div class="node-title">TERMO DE EXECUÇÃO DESCENTRALIZADA (TED)</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">
+                                Instrumento para descentralização de créditos entre órgãos ou entidades da Administração Pública Federal.
+                            </div>
+                            <div class="solution-features">
+                                <div class="feature"><i class="fas fa-university"></i> Órgão federal</div>
+                                <div class="feature"><i class="fas fa-money-bill-wave"></i> Descentralização de crédito</div>
+                                <div class="feature"><i class="fas fa-clipboard-list"></i> Plano de trabalho</div>
+                                <div class="feature"><i class="fas fa-file-invoice"></i> Prestação de contas</div>
+                            </div>
+                            <div class="steps">
+                                <div class="step">Elaborar plano de trabalho detalhado</div>
+                                <div class="step">Obter aprovações necessárias</div>
+                                <div class="step">Formalizar o TED</div>
+                                <div class="step">Executar e prestar contas</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden" id="solConvenioRepasse">
+                <div class="connector"></div>
+                <div class="node solution zoom-in">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon" style="background: rgba(73, 197, 182, 0.1);"><i class="fas fa-file-contract" style="color: #49c5b6;"></i></div>
+                            <div class="node-title">CONVÊNIO DE REPASSE</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">
+                                Instrumento jurídico para transferência de recursos a estados, municípios ou entidades não federais.
+                            </div>
+                            <div class="solution-features">
+                                <div class="feature"><i class="fas fa-city"></i> Estados/Municípios/OSCs</div>
+                                <div class="feature"><i class="fas fa-money-bill-wave"></i> Repasse de recursos</div>
+                                <div class="feature"><i class="fas fa-clipboard-list"></i> Plano de trabalho</div>
+                                <div class="feature"><i class="fas fa-file-invoice"></i> Prestação de contas</div>
+                            </div>
+                            <div class="steps">
+                                <div class="step">Elaborar plano de trabalho detalhado</div>
+                                <div class="step">Verificar regularidade do convenente</div>
+                                <div class="step">Registrar na plataforma +Brasil</div>
+                                <div class="step">Formalizar o convênio e executar</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden" id="solContratoRepasse">
+                <div class="connector"></div>
+                <div class="node solution zoom-in">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon" style="background: rgba(73, 197, 182, 0.1);"><i class="fas fa-university" style="color: #49c5b6;"></i></div>
+                            <div class="node-title">CONTRATO DE REPASSE</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">
+                                Instrumento jurídico com intermediação de instituição financeira federal para repasse de recursos.
+                            </div>
+                            <div class="solution-features">
+                                <div class="feature"><i class="fas fa-building"></i> Operação via instituição financeira</div>
+                                <div class="feature"><i class="fas fa-money-bill-wave"></i> Repasse de recursos</div>
+                                <div class="feature"><i class="fas fa-clipboard-list"></i> Plano de trabalho</div>
+                                <div class="feature"><i class="fas fa-shield-alt"></i> Maior controle</div>
+                            </div>
+                            <div class="steps">
+                                <div class="step">Elaborar plano de trabalho detalhado</div>
+                                <div class="step">Verificar regularidade do contratado</div>
+                                <div class="step">Celebrar contrato com instituição financeira</div>
+                                <div class="step">Acompanhar execução e prestar contas</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden" id="solTermoColaboracao">
+                <div class="connector"></div>
+                <div class="node solution zoom-in">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon" style="background: rgba(73, 197, 182, 0.1);"><i class="fas fa-handshake" style="color: #49c5b6;"></i></div>
+                            <div class="node-title">TERMO DE COLABORAÇÃO</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">
+                                Instrumento do MROSC para execução de projetos propostos pela Administração Pública.
+                            </div>
+                            <div class="solution-features">
+                                <div class="feature"><i class="fas fa-hands-helping"></i> OSCs</div>
+                                <div class="feature"><i class="fas fa-clipboard-list"></i> Plano de trabalho público</div>
+                                <div class="feature"><i class="fas fa-money-bill-wave"></i> Repasse de recursos</div>
+                                <div class="feature"><i class="fas fa-file-invoice"></i> Prestação de contas por resultados</div>
+                            </div>
+                            <div class="steps">
+                                <div class="step">Verificar enquadramento no MROSC</div>
+                                <div class="step">Elaborar plano de trabalho detalhado</div>
+                                <div class="step">Realizar chamamento público ou justificar dispensa</div>
+                                <div class="step">Formalizar o Termo de Colaboração</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden" id="solTermoFomento">
+                <div class="connector"></div>
+                <div class="node solution zoom-in">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon" style="background: rgba(73, 197, 182, 0.1);"><i class="fas fa-lightbulb" style="color: #49c5b6;"></i></div>
+                            <div class="node-title">TERMO DE FOMENTO</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">
+                                Instrumento do MROSC para execução de projetos propostos pelas Organizações da Sociedade Civil.
+                            </div>
+                            <div class="solution-features">
+                                <div class="feature"><i class="fas fa-hands-helping"></i> OSCs</div>
+                                <div class="feature"><i class="fas fa-clipboard-list"></i> Plano de trabalho da OSC</div>
+                                <div class="feature"><i class="fas fa-money-bill-wave"></i> Repasse de recursos</div>
+                                <div class="feature"><i class="fas fa-file-invoice"></i> Prestação de contas por resultados</div>
+                            </div>
+                            <div class="steps">
+                                <div class="step">Verificar enquadramento no MROSC</div>
+                                <div class="step">Analisar plano de trabalho proposto pela OSC</div>
+                                <div class="step">Realizar chamamento público ou justificar dispensa</div>
+                                <div class="step">Formalizar o Termo de Fomento</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden" id="solConsultaJuridica">
+                <div class="connector"></div>
+                <div class="node solution zoom-in">
+                    <div class="node-card">
+                        <div class="node-card-header">
+                            <div class="icon" style="background: rgba(239, 71, 111, 0.1);"><i class="fas fa-gavel" style="color: #ef476f;"></i></div>
+                            <div class="node-title">CONSULTAR ÁREA JURÍDICA</div>
+                        </div>
+                        <div class="node-card-body">
+                            <div class="node-description">
+                                Situação atípica que requer análise específica da área jurídica.
+                            </div>
+                            <div class="solution-features">
+                                <div class="feature"><i class="fas fa-balance-scale"></i>
+                                    <div class="feature"><i class="fas fa-balance-scale"></i> Análise específica</div>
+                                    <div class="feature"><i class="fas fa-search"></i> Caso não padronizado</div>
+                                    <div class="feature"><i class="fas fa-file-signature"></i> Voluntariado possível</div>
+                                    <div class="feature"><i class="fas fa-pen-fancy"></i> Termo de Adesão</div>
+                                </div>
+                                <div class="steps">
+                                    <div class="step">Consultar área jurídica sobre o caso específico</div>
+                                    <div class="step">Considerar Termo de Adesão (Voluntariado)</div>
+                                    <div class="step">Avaliar a possibilidade de parceria não padronizada</div>
+                                    <div class="step">Seguir orientação jurídica específica</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="hidden" id="solContratoSTE">
+                    <div class="connector"></div>
+                    <div class="node solution zoom-in">
+                        <div class="node-card">
+                            <div class="node-card-header">
+                                <div class="icon" style="background: rgba(73, 197, 182, 0.1);"><i class="fas fa-cogs" style="color: #49c5b6;"></i></div>
+                                <div class="node-title">CONTRATO DE PRESTAÇÃO DE SERVIÇOS TÉCNICOS ESPECIALIZADOS (STE)</div>
+                            </div>
+                            <div class="node-card-body">
+                                <div class="node-description">
+                                    Instrumento jurídico para contratação de serviços técnicos especializados no âmbito da Lei de Inovação.
+                                </div>
+                                <div class="solution-features">
+                                    <div class="feature"><i class="fas fa-lightbulb"></i> Lei de Inovação</div>
+                                    <div class="feature"><i class="fas fa-cogs"></i> Serviços técnicos</div>
+                                    <div class="feature"><i class="fas fa-clipboard-list"></i> Especificação técnica</div>
+                                    <div class="feature"><i class="fas fa-university"></i> ICT</div>
+                                </div>
+                                <div class="steps">
+                                    <div class="step">Elaborar especificação técnica detalhada</div>
+                                    <div class="step">Definir entregas, prazos e valores</div>
+                                    <div class="step">Realizar contratação conforme a lei</div>
+                                    <div class="step">Acompanhar a execução e avaliar resultados</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="hidden" id="solAcordoParcerias">
+                    <div class="connector"></div>
+                    <div class="node solution zoom-in">
+                        <div class="node-card">
+                            <div class="node-card-header">
+                                <div class="icon" style="background: rgba(73, 197, 182, 0.1);"><i class="fas fa-handshake" style="color: #49c5b6;"></i></div>
+                                <div class="node-title">ACORDO DE PARCERIA PARA P&D&I</div>
+                            </div>
+                            <div class="node-card-body">
+                                <div class="node-description">
+                                    Instrumento para formalização de parcerias de pesquisa, desenvolvimento e inovação em mútua colaboração.
+                                </div>
+                                <div class="solution-features">
+                                    <div class="feature"><i class="fas fa-lightbulb"></i> Lei de Inovação</div>
+                                    <div class="feature"><i class="fas fa-flask"></i> P&D&I</div>
+                                    <div class="feature"><i class="fas fa-users"></i> Mútua colaboração</div>
+                                    <div class="feature"><i class="fas fa-award"></i> Propriedade intelectual</div>
+                                </div>
+                                <div class="steps">
+                                    <div class="step">Elaborar plano de trabalho conjunto</div>
+                                    <div class="step">Definir contribuições e obrigações das partes</div>
+                                    <div class="step">Estabelecer propriedade intelectual</div>
+                                    <div class="step">Formalizar acordo de parceria específico</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="hidden" id="solContratoPrestacaoServico">
+                    <div class="connector"></div>
+                    <div class="node solution zoom-in">
+                        <div class="node-card">
+                            <div class="node-card-header">
+                                <div class="icon" style="background: rgba(73, 197, 182, 0.1);"><i class="fas fa-file-contract" style="color: #49c5b6;"></i></div>
+                                <div class="node-title">CONTRATO PARA AQUISIÇÃO DE BENS E PRESTAÇÃO DE SERVIÇOS</div>
+                            </div>
+                            <div class="node-card-body">
+                                <div class="node-description">
+                                    Instrumento jurídico para contratação de serviços ou aquisição de bens conforme legislação vigente.
+                                </div>
+                                <div class="solution-features">
+                                    <div class="feature"><i class="fas fa-file-signature"></i> Lei 14.133/2021</div>
+                                    <div class="feature"><i class="fas fa-clipboard-list"></i> Termo de Referência</div>
+                                    <div class="feature"><i class="fas fa-tasks"></i> Serviços definidos</div>
+                                    <div class="feature"><i class="fas fa-truck-loading"></i> Entrega de bens</div>
+                                </div>
+                                <div class="steps">
+                                    <div class="step">Elaborar Termo de Referência detalhado</div>
+                                    <div class="step">Realizar processo licitatório ou dispensa</div>
+                                    <div class="step">Formalizar contrato com obrigações claras</div>
+                                    <div class="step">Acompanhar execução e fiscalizar</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="hidden" id="solAcordoCooperacao">
+                    <div class="connector"></div>
+                    <div class="node solution zoom-in">
+                        <div class="node-card">
+                            <div class="node-card-header">
+                                <div class="icon" style="background: rgba(73, 197, 182, 0.1);"><i class="fas fa-hands-helping" style="color: #49c5b6;"></i></div>
+                                <div class="node-title">ACORDO DE COOPERAÇÃO TÉCNICA</div>
+                            </div>
+                            <div class="node-card-body">
+                                <div class="node-description">
+                                    Instrumento jurídico para formalização de parcerias sem transferência de recursos.
+                                </div>
+                                <div class="solution-features">
+                                    <div class="feature"><i class="fas fa-handshake"></i> Cooperação mútua</div>
+                                    <div class="feature"><i class="fas fa-ban"></i> Sem transferência de recursos</div>
+                                    <div class="feature"><i class="fas fa-clipboard-list"></i> Plano de trabalho</div>
+                                    <div class="feature"><i class="fas fa-tasks"></i> Atribuições das partes</div>
+                                </div>
+                                <div class="steps">
+                                    <div class="step">Elaborar plano de trabalho conjunto</div>
+                                    <div class="step">Definir atribuições e responsabilidades</div>
+                                    <div class="step">Estabelecer contrapartidas não financeiras</div>
+                                    <div class="step">Formalizar o Acordo de Cooperação</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <script>
-        function expandTree(levelId) {
-            document.getElementById('conn1').classList.remove('hidden');
-            document.getElementById(levelId).classList.remove('hidden');
-        }
-
-        function showRoute(routeId) {
-            // Oculta todas as rotas
-            const routes = ['routeA', 'routeB', 'routeC', 'routeD'];
-            routes.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) element.classList.add('hidden');
+    
+        <script>
+            // Estado da aplicação
+            let currentStep = 0;
+            const maxSteps = 5;
+            let history = [];
+    
+            // Inicialização
+            document.addEventListener('DOMContentLoaded', function() {
+                updateProgress();
             });
-
-            // Oculta todas as soluções
-            const solutions = ['solA1', 'solA21', 'solA22'];
-            solutions.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) element.classList.add('hidden');
-            });
-
-            // Oculta questões
-            const questions = ['questionA2'];
-            questions.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) element.classList.add('hidden');
-            });
-
-            // Mostra a rota selecionada
-            document.getElementById('conn2').classList.remove('hidden');
-            document.getElementById(routeId).classList.remove('hidden');
-
-            // Scroll suave para a rota
-            document.getElementById(routeId).scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'center' 
-            });
-        }
-
-        function showQuestion(questionId) {
-            const questions = ['questionA2'];
-            questions.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) element.classList.add('hidden');
-            });
-
-            document.getElementById(questionId).classList.remove('hidden');
-            document.getElementById(questionId).scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'center' 
-            });
-        }
-
-        function showSolution(solutionId) {
-            const solutions = ['solA1', 'solA21', 'solA22'];
-            solutions.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) element.classList.add('hidden');
-            });
-
-            document.getElementById(solutionId).classList.remove('hidden');
-            document.getElementById(solutionId).scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'center' 
-            });
-        }
-
-        // Adiciona efeito de highlight ao clicar
-        document.querySelectorAll('.node').forEach(node => {
-            node.addEventListener('click', function() {
-                document.querySelectorAll('.node').forEach(n => n.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-    </script>
-</body>
+    
+            // Função para expandir a árvore
+            function expandTree(targetId) {
+                const target = document.getElementById(targetId);
+                const connector1 = document.getElementById('conn1');
+                const question1 = document.getElementById('question1');
+                const connector2 = document.getElementById('conn2');
+                
+                if (target) {
+                    connector1.classList.remove('hidden');
+                    setTimeout(() => {
+                        question1.classList.remove('hidden');
+                        question1.classList.add('fade-in');
+                    }, 200);
+                    setTimeout(() => {
+                        connector2.classList.remove('hidden');
+                    }, 400);
+                    setTimeout(() => {
+                        target.classList.remove('hidden');
+                        target.classList.add('fade-in');
+                    }, 600);
+                    
+                    document.getElementById('restartBtn').classList.remove('hidden');
+                    document.getElementById('progressContainer').classList.remove('hidden');
+                    currentStep = 1;
+                    updateProgress();
+                    
+                    showToast('Vamos iniciar a escolha do instrumento jurídico ideal para sua parceria!');
+                }
+            }
+    
+            // Função para mostrar rota
+            function showRoute(routeId) {
+                const route = document.getElementById(routeId);
+                if (route) {
+                    history.push(routeId);
+                    route.classList.remove('hidden');
+                    route.classList.add('slide-in-right');
+                    currentStep++;
+                    updateProgress();
+                    scrollToElement(route);
+                }
+            }
+    
+            // Função para mostrar questão
+            function showQuestion(questionId) {
+                const question = document.getElementById(questionId);
+                if (question) {
+                    history.push(questionId);
+                    question.classList.remove('hidden');
+                    question.classList.add('slide-in-right');
+                    currentStep++;
+                    updateProgress();
+                    scrollToElement(question);
+                }
+            }
+    
+            // Função para mostrar solução
+            function showSolution(solutionId) {
+                const solution = document.getElementById(solutionId);
+                if (solution) {
+                    history.push(solutionId);
+                    solution.classList.remove('hidden');
+                    solution.classList.add('zoom-in');
+                    currentStep++;
+                    updateProgress();
+                    scrollToElement(solution);
+                    showToast('🎉 Solução identificada! Este é o instrumento jurídico ideal para sua parceria.');
+                }
+            }
+    
+            // Função de atualização de progresso
+            function updateProgress() {
+                const progressFill = document.getElementById('progressFill');
+                const progressStep = document.getElementById('progressStep');
+                
+                if (progressFill && progressStep) {
+                    const percentage = (currentStep / maxSteps) * 100;
+                    progressFill.style.width = percentage + '%';
+                    progressStep.textContent = `Passo ${currentStep}/${maxSteps}`;
+                }
+            }
+    
+            // Função para reiniciar a árvore
+            function restartTree() {
+                // Esconde todos os elementos exceto o inicial
+                const hiddenElements = document.querySelectorAll('.node:not(.start)');
+                hiddenElements.forEach(el => {
+                    el.classList.add('hidden');
+                    el.classList.remove('fade-in', 'slide-in-right', 'slide-in-left', 'zoom-in');
+                });
+                
+                // Esconde elementos específicos
+                document.getElementById('conn1').classList.add('hidden');
+                document.getElementById('question1').classList.add('hidden');
+                document.getElementById('conn2').classList.add('hidden');
+                document.getElementById('level1').classList.add('hidden');
+                document.getElementById('restartBtn').classList.add('hidden');
+                document.getElementById('progressContainer').classList.add('hidden');
+                
+                // Reset do estado
+                currentStep = 0;
+                history = [];
+                updateProgress();
+                
+                // Scroll para o topo
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                showToast('Sistema reiniciado! Pronto para um novo diagnóstico.');
+            }
+    
+            // Função para scroll suave até elemento
+            function scrollToElement(element) {
+                setTimeout(() => {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            }
+    
+            // Função para mostrar toast
+            function showToast(message) {
+                const toast = document.getElementById('toast');
+                if (toast) {
+                    toast.textContent = message;
+                    toast.classList.add('active');
+                    
+                    setTimeout(() => {
+                        toast.classList.remove('active');
+                    }, 3000);
+                }
+            }
+    
+            // Função para alternar modo escuro
+            function toggleDarkMode() {
+                document.body.classList.toggle('dark-mode');
+                const darkModeToggle = document.querySelector('.dark-mode-toggle i');
+                
+                if (document.body.classList.contains('dark-mode')) {
+                    darkModeToggle.classList.remove('fa-moon');
+                    darkModeToggle.classList.add('fa-sun');
+                    showToast('Modo escuro ativado');
+                } else {
+                    darkModeToggle.classList.remove('fa-sun');
+                    darkModeToggle.classList.add('fa-moon');
+                    showToast('Modo claro ativado');
+                }
+            }
+        </script>
+    </body>
 </html>
